@@ -36,12 +36,12 @@ public class ReverseIlikeExpression implements Criterion {
         if (columns.length != 1) throw new HibernateException("ilike may only be used with single-column properties");
         
         final String columnName = columns[0];
-        final String value = matchMode.toMatchString(factory, columnName);
+        final String s = matchMode.toMatchString(factory, columnName);
         
         if (dialect instanceof PostgreSQLDialect) {
-            return "? ilike " + value;
+            return "? ilike " + s;
         } else {
-            return "? like " + dialect.getLowercaseFunction() + "(" + value + ")";
+            return "? like " + dialect.getLowercaseFunction() + "(" + s + ")";
         }
 
         

@@ -41,9 +41,9 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     }
     
     @Override
-    @SuppressWarnings("unchecked")
     public Object deepCopy(Object value) {
         if (value == null) return null;
+        @SuppressWarnings("unchecked")
         final Collection<E> values = Collection.class.cast(value);
         final Set<E> enums = EnumSet.noneOf(type);
         enums.addAll(values);
@@ -56,18 +56,20 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     }
     
     @Override
-    public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws HibernateException, SQLException {
+    public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) 
+        throws HibernateException, SQLException {
         final long flag = resultSet.getLong(names[0]);
         return EnumUtility.decode(type, flag);
     }
     
     @Override
-    @SuppressWarnings("unchecked")
-    public void nullSafeSet(PreparedStatement statement, Object value, int index) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement statement, Object value, int index) 
+        throws HibernateException, SQLException {
         if (value == null) {
             statement.setLong(index, 0);
             return;
         }
+        @SuppressWarnings("unchecked")
         final Set<E> enums = (Set<E>) value;
         final long flag = EnumUtility.encode(enums);
         statement.setLong(index, flag);

@@ -89,12 +89,14 @@ public final class CustomRestrictions {
 	}
 	
 	public static Criterion notIlike(String propertyName, String value, MatchMode matchMode) {
-		return StringUtils.isEmpty(value) ?
-			CustomRestrictions.isNotEmpty(propertyName) :
-			Restrictions.or(
-				Restrictions.not(Restrictions.ilike(propertyName, value, matchMode)),
-				CustomRestrictions.isEmpty(propertyName)
-			);
+	    if (StringUtils.isEmpty(value)) {
+	        return CustomRestrictions.isNotEmpty(propertyName);
+	    } else {
+            return Restrictions.or(
+                Restrictions.not(Restrictions.ilike(propertyName, value, matchMode)),
+                CustomRestrictions.isEmpty(propertyName)
+            );
+	    }
 	}
 	
 	public static Criterion notIlike(String propertyName, String value) {
@@ -148,25 +150,53 @@ public final class CustomRestrictions {
 	
 	public static Criterion integer(String propertyName, int value, Operator operator) {
 		switch (operator) {
-			case GT : return Restrictions.gt(propertyName, value);
-			case GE : return Restrictions.ge(propertyName, value);
-			case EQ : return Restrictions.eq(propertyName, value);
-			case NE : return Restrictions.ne(propertyName, value);
-			case LE : return Restrictions.le(propertyName, value);
-			case LT : return Restrictions.lt(propertyName, value);
-			default : throw new IllegalArgumentException(operator.toString());
+    		case GT: {
+    		    return Restrictions.gt(propertyName, value);
+    		}
+    		case GE: {
+    		    return Restrictions.ge(propertyName, value);
+    		}
+    		case EQ: {
+    		    return Restrictions.eq(propertyName, value);
+    		}
+    		case NE: {
+    		    return Restrictions.ne(propertyName, value);
+    		}
+    		case LE: {
+    		    return Restrictions.le(propertyName, value);
+    		}
+    		case LT: {
+    		    return Restrictions.lt(propertyName, value);
+    		}
+    		default: {
+    		    throw new IllegalArgumentException(operator.toString());
+    		}
 		}
 	}
     
     public static Criterion number(String propertyName, Number value, Operator operator) {
         switch (operator) {
-            case GT : return Restrictions.gt(propertyName, value);
-            case GE : return Restrictions.ge(propertyName, value);
-            case EQ : return Restrictions.eq(propertyName, value);
-            case NE : return Restrictions.ne(propertyName, value);
-            case LE : return Restrictions.le(propertyName, value);
-            case LT : return Restrictions.lt(propertyName, value);
-            default : throw new IllegalArgumentException(operator.toString());
+            case GT : {
+                return Restrictions.gt(propertyName, value);
+            }
+            case GE : {
+                return Restrictions.ge(propertyName, value);
+            }
+            case EQ : {
+                return Restrictions.eq(propertyName, value);
+            }
+            case NE : {
+                return Restrictions.ne(propertyName, value);
+            }
+            case LE : {
+                return Restrictions.le(propertyName, value);
+            }
+            case LT : {
+                return Restrictions.lt(propertyName, value);
+            }
+            default : {
+                throw new IllegalArgumentException(operator.toString());
+            }
         }
     }
 	
@@ -174,8 +204,12 @@ public final class CustomRestrictions {
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		switch (operator) {
-			case GT : return Restrictions.gt(propertyName, date);
-			case LT : return Restrictions.lt(propertyName, date);
+			case GT : {
+			    return Restrictions.gt(propertyName, date);
+			}
+			case LT : {
+			    return Restrictions.lt(propertyName, date);
+			}
 			case EQ : 
 				calendar.set(Calendar.SECOND, 0);
 				calendar.set(Calendar.MINUTE, 0);
@@ -195,26 +229,46 @@ public final class CustomRestrictions {
 				calendar.set(Calendar.HOUR, 0);
 				calendar.add(Calendar.DAY_OF_MONTH, 1);
 				return Restrictions.le(propertyName, calendar.getTime());
-			default : throw new IllegalArgumentException(operator.toString());
+			default : {
+			    throw new IllegalArgumentException(operator.toString());
+			}
 		}
 	}
 	
 	public static Criterion enumerated(String propertyName, Enum<?> value, Operator operator) {
 		switch (operator) {
-			case EQ : return Restrictions.eq(propertyName, value);
-			case NE : return CustomRestrictions.neOrNull(propertyName, value);
-			default : throw new IllegalArgumentException(operator.toString());
+			case EQ : {
+			    return Restrictions.eq(propertyName, value);
+			}
+			case NE : {
+			    return CustomRestrictions.neOrNull(propertyName, value);
+			}
+			default : {
+			    throw new IllegalArgumentException(operator.toString());
+			}
 		}
 	}
 
 	public static Criterion collection(String propertyName, int size, Operator operator) {
 		switch (operator) {
-			case GT : return Restrictions.sizeGt(propertyName, size);
-			case LT : return Restrictions.sizeLt(propertyName, size);
-			case EQ : return Restrictions.sizeEq(propertyName, size);
-			case GE : return Restrictions.sizeGe(propertyName, size);
-			case LE : return Restrictions.sizeLe(propertyName, size);
-			default : throw new IllegalArgumentException(operator.toString());
+			case GT : {
+			    return Restrictions.sizeGt(propertyName, size);
+			}
+			case LT : {
+			    return Restrictions.sizeLt(propertyName, size);
+			}
+			case EQ : {
+			    return Restrictions.sizeEq(propertyName, size);
+			}
+			case GE : {
+			    return Restrictions.sizeGe(propertyName, size);
+			}
+			case LE : {
+			    return Restrictions.sizeLe(propertyName, size);
+			}
+			default : {
+			    throw new IllegalArgumentException(operator.toString());
+			}
 		}
 	}
 	

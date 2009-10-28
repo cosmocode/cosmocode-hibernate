@@ -10,7 +10,9 @@ public final class CustomMySQLRestrictions {
 	}
 	
 	private static Criterion bit(String columnName, String binaryOperator, long flag, String operator, long value) {
-	    return Restrictions.sqlRestriction("({alias}." + columnName + " " + binaryOperator + " " + flag + ") " + operator + " " + value);
+	    return Restrictions.sqlRestriction(
+            "({alias}." + columnName + " " + binaryOperator + " " + flag + ") " + operator + " " + value
+        );
 	}
 	
 	public static Criterion bitAndGt(String columnName, long flag, long value) {
