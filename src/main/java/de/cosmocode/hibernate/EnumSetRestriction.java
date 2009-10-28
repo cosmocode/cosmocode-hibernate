@@ -41,7 +41,7 @@ public class EnumSetRestriction<E extends Enum<E>> implements Criterion {
         final String[] columns = criteriaQuery.getColumnsUsingProjection(criteria, propertyName);
         final String[] fragments = new String[columns.length];
         
-        for (int i=0; i<columns.length; i++) {
+        for (int i = 0; i < columns.length; i++) {
             fragments[i] = 
                 "(" + columns[i] + " " + bitOp + " " + EnumUtility.encode(enums) + " " + op + " " + value + ")";
         }

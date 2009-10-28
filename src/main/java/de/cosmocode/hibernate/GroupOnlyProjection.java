@@ -7,14 +7,14 @@ import org.hibernate.criterion.PropertyProjection;
 
 public class GroupOnlyProjection extends PropertyProjection {
 
-	private static final long serialVersionUID = 5181025087712804297L;
+    private static final long serialVersionUID = 5181025087712804297L;
 
-	public GroupOnlyProjection(String prop) {
-		super(prop, true);
-	}
+    public GroupOnlyProjection(String prop) {
+        super(prop, true);
+    }
 
-	public String toSqlString(Criteria criteria, int position, CriteriaQuery criteriaQuery) throws HibernateException {
-		return isGrouped() ? "" : super.toSqlString(criteria, position, criteriaQuery);
-	}
+    public String toSqlString(Criteria criteria, int position, CriteriaQuery criteriaQuery) throws HibernateException {
+        return isGrouped() ? "" : super.toSqlString(criteria, position, criteriaQuery);
+    }
 
 }
