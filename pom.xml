@@ -32,17 +32,14 @@
     <dependency>
     	<groupId>org.hibernate</groupId>
     	<artifactId>hibernate-core</artifactId>
-    	<version>3.3.2.GA</version>
     </dependency>
     <dependency>
     	<groupId>commons-lang</groupId>
     	<artifactId>commons-lang</artifactId>
-    	<version>2.4</version>
     </dependency>
     <dependency>
     	<groupId>de.cosmocode</groupId>
     	<artifactId>cosmocode-commons</artifactId>
-    	<version>1.0</version>
     </dependency>
   </dependencies>
 </project>
