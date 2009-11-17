@@ -39,6 +39,7 @@
     <dependency>
     	<groupId>de.cosmocode</groupId>
     	<artifactId>cosmocode-commons</artifactId>
+    	<version>1.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

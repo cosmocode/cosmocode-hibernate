@@ -11,6 +11,8 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
+import de.cosmocode.commons.Calendars;
+
 public final class CustomRestrictions {
 
     /**
@@ -207,31 +209,29 @@ public final class CustomRestrictions {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         switch (operator) {
-            case GT : {
-                return Restrictions.gt(propertyName, date);
+            case GT: {
+                Calendars.toEndOfTheDay(calendar);
+                return Restrictions.gt(propertyName, calendar.getTime());
             }
-            case LT : {
-                return Restrictions.lt(propertyName, date);
+            case GE: {
+                Calendars.toBeginningOfTheDay(calendar);
+                return Restrictions.ge(propertyName, calendar.getTime());
             }
-            case EQ : 
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.HOUR, 0);
+            case EQ: { 
+                Calendars.toBeginningOfTheDay(calendar);
                 final Date begin = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                Calendars.toEndOfTheDay(calendar);
                 final Date end = calendar.getTime();
                 return Restrictions.between(propertyName, begin, end);
-            case GE :
-                calendar.set(Calendar.HOUR, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.HOUR, 0);
-                return Restrictions.ge(propertyName, calendar.getTime());
-            case LE :
-                calendar.set(Calendar.HOUR, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.HOUR, 0);
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            case LE: {
+                Calendars.toEndOfTheDay(calendar);
                 return Restrictions.le(propertyName, calendar.getTime());
+            }
+            case LT: {
+                Calendars.toBeginningOfTheDay(calendar);
+                return Restrictions.lt(propertyName, calendar.getTime());
+            }
             default : {
                 throw new IllegalArgumentException(operator.toString());
             }
