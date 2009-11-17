@@ -10,7 +10,7 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.engine.TypedValue;
 
-import de.cosmocode.commons.EnumUtility;
+import de.cosmocode.commons.Enums;
 
 public class EnumSetRestriction<E extends Enum<E>> implements Criterion {
 
@@ -43,7 +43,7 @@ public class EnumSetRestriction<E extends Enum<E>> implements Criterion {
         
         for (int i = 0; i < columns.length; i++) {
             fragments[i] = 
-                "(" + columns[i] + " " + bitOp + " " + EnumUtility.encode(enums) + " " + op + " " + value + ")";
+                "(" + columns[i] + " " + bitOp + " " + Enums.encode(enums) + " " + op + " " + value + ")";
         }
         
         return StringUtils.join(fragments, " and ");

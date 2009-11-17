@@ -12,7 +12,7 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
-import de.cosmocode.commons.EnumUtility;
+import de.cosmocode.commons.Enums;
 
 public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     
@@ -59,7 +59,7 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) 
         throws HibernateException, SQLException {
         final long flag = resultSet.getLong(names[0]);
-        return EnumUtility.decode(type, flag);
+        return Enums.decode(type, flag);
     }
     
     @Override
@@ -71,7 +71,7 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
         }
         @SuppressWarnings("unchecked")
         final Set<E> enums = (Set<E>) value;
-        final long flag = EnumUtility.encode(enums);
+        final long flag = Enums.encode(enums);
         statement.setLong(index, flag);
     }
     
