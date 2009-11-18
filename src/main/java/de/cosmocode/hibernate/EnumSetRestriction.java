@@ -12,6 +12,15 @@ import org.hibernate.engine.TypedValue;
 
 import de.cosmocode.commons.Enums;
 
+/**
+ * A {@link Criterion} used to restrict by {@link EnumSet}s
+ * being stored as bitsets.
+ * 
+ * @see EnumSetUserType
+ *
+ * @author Willi Schoenborn
+ * @param <E> the generic enum type
+ */
 public class EnumSetRestriction<E extends Enum<E>> implements Criterion {
 
     private static final long serialVersionUID = 2754183680699907609L;

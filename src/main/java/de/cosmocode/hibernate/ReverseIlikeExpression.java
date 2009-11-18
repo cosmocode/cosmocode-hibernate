@@ -4,11 +4,30 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.IlikeExpression;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.TypedValue;
 
+/**
+ * A version of the {@link IlikeExpression} which uses
+ * the property as the pattern.
+ * 
+ * <p>
+ *   A normal {@link IlikeExpression} renders ilike expressions
+ *   like this:
+ *   <pre>
+ *     lower(my_column) like ?
+ *   </pre>
+ *   This implementation produces the following:
+ *   <pre>
+ *     ? like lower(concat('%', my_column))
+ *   </pre>
+ * </p>
+ *
+ * @author Willi Schoenborn
+ */
 public class ReverseIlikeExpression implements Criterion {
 
     private static final long serialVersionUID = -7965682008508199091L;
@@ -16,10 +35,6 @@ public class ReverseIlikeExpression implements Criterion {
     private final String propertyName;
     private final Object value;
     private final PropertyMatchMode matchMode;
-
-    protected ReverseIlikeExpression(String propertyName, String value) {
-        this(propertyName, value, PropertyMatchMode.EXACT);
-    }
 
     protected ReverseIlikeExpression(String propertyName, String value, PropertyMatchMode matchMode) {
         this.propertyName = propertyName;
@@ -43,7 +58,6 @@ public class ReverseIlikeExpression implements Criterion {
         } else {
             return "? like " + dialect.getLowercaseFunction() + "(" + s + ")";
         }
-
         
     }
 
@@ -52,6 +66,7 @@ public class ReverseIlikeExpression implements Criterion {
         return new TypedValue[] {criteriaQuery.getTypedValue(criteria, propertyName, value.toString().toLowerCase())};
     }
 
+    @Override
     public String toString() {
         return value + " ilike " + propertyName;
     }

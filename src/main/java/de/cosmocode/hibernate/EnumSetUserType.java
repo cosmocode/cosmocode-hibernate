@@ -14,6 +14,12 @@ import org.hibernate.usertype.UserType;
 
 import de.cosmocode.commons.Enums;
 
+/**
+ * A {@link UserType} for storing {@link EnumSet}s as bitsets.
+ *
+ * @author Willi Schoenborn
+ * @param <E> the generic enum type
+ */
 public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     
     private static final int[] SQL_TYPES = {Types.BIGINT};
@@ -76,15 +82,17 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     }
     
     @Override
-    @SuppressWarnings("unchecked")
     public Object assemble(Serializable cached, Object owner) throws HibernateException {
-        return cached == null ? null : EnumSet.copyOf((Set<E>) cached);
+        @SuppressWarnings("unchecked")
+        final Set<E> set = Set.class.cast(cached);
+        return cached == null ? null : EnumSet.copyOf(set);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Serializable disassemble(Object value) throws HibernateException {
-        return value == null ? null : EnumSet.copyOf((Set<E>) value);
+        @SuppressWarnings("unchecked")
+        final Set<E> set = Set.class.cast(value);
+        return value == null ? null : EnumSet.copyOf(set);
     }
     
     @Override

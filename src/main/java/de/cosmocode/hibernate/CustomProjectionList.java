@@ -6,10 +6,17 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 
+/**
+ * A custom {@link ProjectionList} which handles
+ * {@link GroupOnlyProjection}s correctly.
+ *
+ * @author Willi Schoenborn
+ */
 public class CustomProjectionList extends ProjectionList {
     
     private static final long serialVersionUID = -7323390575260218801L;
     
+    @Override
     public String toSqlString(Criteria criteria, int loc, CriteriaQuery criteriaQuery) throws HibernateException {
         final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < getLength(); i++) {

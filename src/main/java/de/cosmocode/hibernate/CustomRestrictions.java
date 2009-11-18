@@ -1,7 +1,5 @@
 package de.cosmocode.hibernate;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,8 +9,11 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
-import de.cosmocode.commons.Calendars;
-
+/**
+ * A custom version of {@link Restrictions}.
+ * 
+ * @author Willi Schoenborn
+ */
 public final class CustomRestrictions {
 
     /**
@@ -24,8 +25,11 @@ public final class CustomRestrictions {
 
     /**
      * Group expressions together in a single disjunction (A or B or C...).
-     *
-     * @return Conjunction
+     * 
+     * @param first the first {@link Criterion}
+     * @param second the second {@link Criterion}
+     * @param rest the rest
+     * @return a {@link Criterion} containing all parameters combined in disjunct style
      */
     public static Criterion disjunction(Criterion first, Criterion second, Criterion... rest) {
         final Disjunction disjunction = Restrictions.disjunction();
@@ -38,8 +42,11 @@ public final class CustomRestrictions {
 
     /**
      * Group expressions together in a single conjunction (A and B and C...).
-     *
-     * @return Conjunction
+     * 
+     * @param first the first {@link Criterion}
+     * @param second the second {@link Criterion}
+     * @param rest the rest
+     * @return a {@link Criterion} containing all parameters combined in conjuct style
      */
     public static Criterion conjunction(Criterion first, Criterion second, Criterion... rest) {
         final Conjunction conjunction = Restrictions.conjunction();
@@ -50,25 +57,60 @@ public final class CustomRestrictions {
         return conjunction;
     }
     
+    /**
+     * Apply an "equal" constraint to the named property.
+     * 
+     * <p>
+     *   Note: This implementation differs from {@link Restrictions#eq(String, Object)}
+     *   because it checks for empty strings and applies {@link CustomRestrictions#isEmpty(String)}
+     *   instead.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be equals to
+     * @return a new {@link Criterion}
+     */
     public static Criterion eq(String propertyName, String value) {
         return StringUtils.isEmpty(value) ?
             CustomRestrictions.isEmpty(propertyName) :
             Restrictions.eq(propertyName, value);
     }
     
+    /**
+     * Apply a "not equal" constraint to the named property.
+     * 
+     * <p>
+     *   Note: This implementation differs from {@link Restrictions#ne(String, Object)}
+     *   because it returns {@link CustomRestrictions#isNotEmpty(String)}
+     *   in case value is an empty string and returns an logical or expression
+     *   of {@link Restrictions#ne(String, Object)} and {@link Restrictions#isNull(String)}.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be not equals to
+     * @return a new {@link Criterion}
+     */
     public static Criterion ne(String propertyName, String value) {
-        return StringUtils.isEmpty(value) ?
-            CustomRestrictions.isNotEmpty(propertyName) :
-            CustomRestrictions.neOrNull(propertyName, value);
+        if (StringUtils.isEmpty(value)) {
+            return CustomRestrictions.isNotEmpty(propertyName);
+        } else {
+            return Restrictions.or(
+                Restrictions.ne(propertyName, value),
+                Restrictions.isNull(propertyName)
+            );
+        }
     }
     
-    public static Criterion neOrNull(String propertyName, Object value) {
-        return Restrictions.or(
-            Restrictions.ne(propertyName, value), 
-            Restrictions.isNull(propertyName)
-        );
-    }
-    
+    /**
+     * Apply an "empty" constraint on the named property.
+     * 
+     * <p>
+     *   See also {@link StringUtils#isEmpty(String)}
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @return a new {@link Criterion}
+     */
     public static Criterion isEmpty(String propertyName) {
         return Restrictions.or(
             Restrictions.eq(propertyName, ""),
@@ -76,23 +118,74 @@ public final class CustomRestrictions {
         );
     }
     
+    /**
+     * Apply a "not empty" constraint to the named property.
+     * 
+     * <p>
+     *   See also {@link StringUtils#isNotEmpty(String)}
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @return a new {@link Criterion}
+     */
     public static Criterion isNotEmpty(String propertyName) {
-        return Restrictions.and(
-            Restrictions.ne(propertyName, ""),
-            Restrictions.isNotNull(propertyName)
-        );
+        return Restrictions.not(CustomRestrictions.isEmpty(propertyName));
     }
     
+    /**
+     * Apply an "ilike" constraint on the named property.
+     * 
+     * <p>
+     *   Note: This implementation differs from {@link Restrictions#ilike(String, String, MatchMode)}
+     *   because it checks for empty strings and applies {@link CustomRestrictions#isEmpty(String)}
+     *   instead.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be similiar to
+     * @param matchMode the {@link MatchMode} being used
+     * @return a new {@link Criterion}
+     */
     public static Criterion ilike(String propertyName, String value, MatchMode matchMode) {
         return StringUtils.isEmpty(value) ? 
             CustomRestrictions.isEmpty(propertyName) : 
             Restrictions.ilike(propertyName, value, matchMode);
     }
     
+    /**
+     * Apply an "ilike" constraint on the named property.
+     * 
+     * <p>
+     *   Note: This implementation differs from {@link Restrictions#ilike(String, Object)}
+     *   because it checks for empty strings and applies {@link CustomRestrictions#isEmpty(String)}
+     *   instead.
+     * </p>
+     * 
+     * <p>
+     *   Its equivalent to calling {@link CustomRestrictions#ilike(String, String, MatchMode)}
+     *   using {@link MatchMode#ANYWHERE}.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be similiar to
+     * @return a new {@link Criterion}
+     */
     public static Criterion ilike(String propertyName, String value) {
         return ilike(propertyName, value, MatchMode.ANYWHERE);
     }
     
+    /**
+     * Apply a "not ilike" constraint on the named property.
+     * 
+     * <p>
+     *   This implementation handles empty values correctly.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be similiar to
+     * @param matchMode the {@link MatchMode} being used
+     * @return a new {@link Criterion}
+     */
     public static Criterion notIlike(String propertyName, String value, MatchMode matchMode) {
         if (StringUtils.isEmpty(value)) {
             return CustomRestrictions.isNotEmpty(propertyName);
@@ -104,189 +197,136 @@ public final class CustomRestrictions {
         }
     }
     
+    /**
+     * Apply a "not ilike" constraint on the named property.
+     * 
+     * <p>
+     *   This implementation handles empty values correctly.
+     * </p>
+     * 
+     * <p>
+     *   Its equivalent to calling {@link CustomRestrictions#notIlike(String, String, MatchMode)}
+     *   using {@link MatchMode#ANYWHERE}.
+     * </p>
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value the property should be similiar to
+     * @return a new {@link Criterion}
+     */
     public static Criterion notIlike(String propertyName, String value) {
         return notIlike(propertyName, value, MatchMode.ANYWHERE);
     }
     
-    public static Criterion reverseIlike(String value, String propertyName, PropertyMatchMode matchMode) {
+    /**
+     * Apply a "reverse ilike" expression on the named property.
+     * 
+     * @see ReverseIlikeExpression
+     * @see PropertyMatchMode
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value which should be similiar to the named property
+     * @param matchMode the {@link PropertyMatchMode} being used
+     * @return a new {@link Criterion}
+     */
+    public static Criterion reverseIlike(String propertyName, String value, PropertyMatchMode matchMode) {
         return new ReverseIlikeExpression(propertyName, value, matchMode);
     }
-    
-    public static Criterion reverseIlike(String value, String propertyName) {
-        return new ReverseIlikeExpression(propertyName, value);
-    }
-    
-    public static Criterion notReverseIlike(String value, String propertyName, PropertyMatchMode matchMode) {
-        return Restrictions.not(reverseIlike(value, propertyName, matchMode));
-    }
-    
-    public static Criterion notReverseIlike(String value, String propertyName) {
-        return Restrictions.not(reverseIlike(value, propertyName));
-    }
-    
-    /*
-     * OLD STUFF, below
+
+    /**
+     * Apply a "reverse ilike" expression on the named property.
+     * 
+     * <p>
+     *   Its equivalent to calling {@link CustomRestrictions#reverseIlike(String, String, PropertyMatchMode)}
+     *   using {@link PropertyMatchMode#ANYWHERE}
+     * </p>
+     * 
+     * @see ReverseIlikeExpression
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value which should be similiar to the named property
+     * @return a new {@link Criterion}
      */
-    
-    public static Criterion eqOrNull(String propertyName, Object value) {
-        return Restrictions.or(
-            Restrictions.eq(propertyName, value), 
-            Restrictions.isNull(propertyName)
-        );
-    }
-    
-    public static Criterion eqOrEqOrNull(String propertyName, boolean value) {
-        return value ? 
-            Restrictions.eq(propertyName, value) : 
-            CustomRestrictions.eqOrNull(propertyName, value);
-    }
-    
-    public static Criterion eqOrBlank(String propertyName, String value) {
-        return StringUtils.isEmpty(value) ? 
-            CustomRestrictions.isEmpty(propertyName) : 
-            Restrictions.eq(propertyName, value);
-    }
-    
-    public static Criterion neOrBlank(String propertyName, String value) {
-        return StringUtils.isEmpty(value) ? 
-            CustomRestrictions.isNotEmpty(propertyName) : 
-            Restrictions.ne(propertyName, value);
-    }
-    
-    public static Criterion integer(String propertyName, int value, Operator operator) {
-        switch (operator) {
-            case GT: {
-                return Restrictions.gt(propertyName, value);
-            }
-            case GE: {
-                return Restrictions.ge(propertyName, value);
-            }
-            case EQ: {
-                return Restrictions.eq(propertyName, value);
-            }
-            case NE: {
-                return Restrictions.ne(propertyName, value);
-            }
-            case LE: {
-                return Restrictions.le(propertyName, value);
-            }
-            case LT: {
-                return Restrictions.lt(propertyName, value);
-            }
-            default: {
-                throw new IllegalArgumentException(operator.toString());
-            }
-        }
-    }
-    
-    public static Criterion number(String propertyName, Number value, Operator operator) {
-        switch (operator) {
-            case GT : {
-                return Restrictions.gt(propertyName, value);
-            }
-            case GE : {
-                return Restrictions.ge(propertyName, value);
-            }
-            case EQ : {
-                return Restrictions.eq(propertyName, value);
-            }
-            case NE : {
-                return Restrictions.ne(propertyName, value);
-            }
-            case LE : {
-                return Restrictions.le(propertyName, value);
-            }
-            case LT : {
-                return Restrictions.lt(propertyName, value);
-            }
-            default : {
-                throw new IllegalArgumentException(operator.toString());
-            }
-        }
-    }
-    
-    public static Criterion date(String propertyName, Date date, Operator operator) {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        switch (operator) {
-            case GT: {
-                Calendars.toEndOfTheDay(calendar);
-                return Restrictions.gt(propertyName, calendar.getTime());
-            }
-            case GE: {
-                Calendars.toBeginningOfTheDay(calendar);
-                return Restrictions.ge(propertyName, calendar.getTime());
-            }
-            case EQ: { 
-                Calendars.toBeginningOfTheDay(calendar);
-                final Date begin = calendar.getTime();
-                Calendars.toEndOfTheDay(calendar);
-                final Date end = calendar.getTime();
-                return Restrictions.between(propertyName, begin, end);
-            }
-            case LE: {
-                Calendars.toEndOfTheDay(calendar);
-                return Restrictions.le(propertyName, calendar.getTime());
-            }
-            case LT: {
-                Calendars.toBeginningOfTheDay(calendar);
-                return Restrictions.lt(propertyName, calendar.getTime());
-            }
-            default : {
-                throw new IllegalArgumentException(operator.toString());
-            }
-        }
-    }
-    
-    public static Criterion enumerated(String propertyName, Enum<?> value, Operator operator) {
-        switch (operator) {
-            case EQ : {
-                return Restrictions.eq(propertyName, value);
-            }
-            case NE : {
-                return CustomRestrictions.neOrNull(propertyName, value);
-            }
-            default : {
-                throw new IllegalArgumentException(operator.toString());
-            }
-        }
+    public static Criterion reverseIlike(String propertyName, String value) {
+        return CustomRestrictions.reverseIlike(propertyName, value, PropertyMatchMode.ANYWHERE);
     }
 
-    public static Criterion collection(String propertyName, int size, Operator operator) {
-        switch (operator) {
-            case GT : {
-                return Restrictions.sizeGt(propertyName, size);
-            }
-            case LT : {
-                return Restrictions.sizeLt(propertyName, size);
-            }
-            case EQ : {
-                return Restrictions.sizeEq(propertyName, size);
-            }
-            case GE : {
-                return Restrictions.sizeGe(propertyName, size);
-            }
-            case LE : {
-                return Restrictions.sizeLe(propertyName, size);
-            }
-            default : {
-                throw new IllegalArgumentException(operator.toString());
-            }
-        }
+    /**
+     * Apply a "not reverse ilike" expression on the named property.
+     * 
+     * @see ReverseIlikeExpression
+     * @see PropertyMatchMode
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value which should not be similiar to the named property
+     * @param matchMode the {@link PropertyMatchMode} being used
+     * @return a new {@link Criterion}
+     */
+    public static Criterion notReverseIlike(String propertyName, String value, PropertyMatchMode matchMode) {
+        return Restrictions.not(CustomRestrictions.reverseIlike(propertyName, value, matchMode));
+    }
+
+    /**
+     * Apply a "not reverse ilike" expression on the named property.
+     * 
+     * <p>
+     *   Its equivalent to calling {@link CustomRestrictions#notReverseIlike(String, String, PropertyMatchMode)}
+     *   using {@link PropertyMatchMode#ANYWHERE}
+     * </p>
+     * 
+     * @see ReverseIlikeExpression
+     * 
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param value the actual value which should not be similiar to the named property
+     * @return a new {@link Criterion}
+     */
+    public static Criterion notReverseIlike(String propertyName, String value) {
+        return CustomRestrictions.notReverseIlike(propertyName, value, PropertyMatchMode.ANYWHERE);
     }
     
+    /**
+     * Apply a "has" constraint to the named enumset property.
+     * 
+     * @param <E> the generic enum type
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param e the enum value the named property should contain
+     * @return a new {@link Criterion}
+     */
     public static <E extends Enum<E>> Criterion has(String propertyName, E e) {
         return new EnumSetRestriction<E>(propertyName, "&", e, ">", 0);
     }
-    
+
+    /**
+     * Apply a "all" constraint to the named enumset property.
+     * 
+     * @param <E> the generic enum type
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param enums the set of enums the named property should contain
+     * @return a new {@link Criterion}
+     */
     public static <E extends Enum<E>> Criterion all(String propertyName, Set<E> enums) {
         return new EnumSetRestriction<E>(propertyName, "&", enums, ">", 0);
     }
-    
-    public static <E extends Enum<E>> Criterion ne(String propertyName, E e) {
+
+    /**
+     * Apply a "not has" constraint to the named enumset property.
+     * 
+     * @param <E> the generic enum type
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param e the enum value the named property should not contain
+     * @return a new {@link Criterion}
+     */
+    public static <E extends Enum<E>> Criterion notHas(String propertyName, E e) {
         return new EnumSetRestriction<E>(propertyName, "&", e, "=", 0); 
     }
-    
+
+    /**
+     * Apply a "none" constraint to the named enumset property.
+     * 
+     * @param <E> the generic enum type
+     * @param propertyName the name of the property the constraint should be applied to
+     * @param enums the set of enums the named property should not contain
+     * @return a new {@link Criterion}
+     */
     public static <E extends Enum<E>> Criterion none(String propertyName, Set<E> enums) {
         return new EnumSetRestriction<E>(propertyName, "&", enums, "=", 0);
     }
