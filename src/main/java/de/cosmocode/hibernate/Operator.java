@@ -69,7 +69,7 @@ public enum Operator {
         
         @Override
         public Criterion restrict(String propertyName, Object value) {
-            return Restrictions.gt(propertyName, value);
+            return Restrictions.eq(propertyName, value);
         }
         
         @Override
