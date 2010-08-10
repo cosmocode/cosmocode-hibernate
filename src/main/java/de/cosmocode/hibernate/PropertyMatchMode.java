@@ -41,6 +41,7 @@ public enum PropertyMatchMode {
         }
         
     },
+    
     START {
         
         @Override
@@ -49,6 +50,7 @@ public enum PropertyMatchMode {
         }
         
     },
+    
     END {
         
         @Override
@@ -57,6 +59,7 @@ public enum PropertyMatchMode {
         }
         
     },
+    
     ANYWHERE {
         
         @Override
