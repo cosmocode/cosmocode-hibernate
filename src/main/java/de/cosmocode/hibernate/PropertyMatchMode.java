@@ -80,6 +80,8 @@ public enum PropertyMatchMode {
      */
     public abstract String toMatchString(SessionFactoryImplementor factory, String columnName);
     
+    // unless a new api is provided
+    @SuppressWarnings("deprecation")
     private static String render(SessionFactoryImplementor factory, Object... args) {
         final Dialect dialect = factory.getDialect();
         final SQLFunction concat = SQLFunction.class.cast(dialect.getFunctions().get("concat"));

@@ -28,6 +28,8 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
+import com.google.common.base.Objects;
+
 import de.cosmocode.commons.Enums;
 
 /**
@@ -58,8 +60,7 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
     
     @Override
     public boolean equals(Object x, Object y) {
-        if (x == null) return y == null;
-        return x.equals(y);
+        return Objects.equal(x, y);
     }
     
     @Override
@@ -89,12 +90,12 @@ public abstract class EnumSetUserType<E extends Enum<E>> implements UserType {
         throws HibernateException, SQLException {
         if (value == null) {
             statement.setLong(index, 0);
-            return;
+        } else {
+            @SuppressWarnings("unchecked")
+            final Set<E> enums = (Set<E>) value;
+            final long flag = Enums.encode(enums);
+            statement.setLong(index, flag);
         }
-        @SuppressWarnings("unchecked")
-        final Set<E> enums = (Set<E>) value;
-        final long flag = Enums.encode(enums);
-        statement.setLong(index, flag);
     }
     
     @Override
