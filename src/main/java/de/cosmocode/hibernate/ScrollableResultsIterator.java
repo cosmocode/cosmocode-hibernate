@@ -56,7 +56,7 @@ public final class ScrollableResultsIterator<E> implements Iterator<E> {
         } else {
             throw new NoSuchElementException("No elements left in results");
         }
-    };
+    }
     
     @Override
     public void remove() {

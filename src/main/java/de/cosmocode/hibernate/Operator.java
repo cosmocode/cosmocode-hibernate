@@ -47,7 +47,7 @@ public enum Operator {
         @Override
         public <E extends Enum<E>> Criterion restrictEnum(String propertyName, E e) {
             throw new UnsupportedOperationException();
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
@@ -72,7 +72,7 @@ public enum Operator {
         @Override
         public <E extends Enum<E>> Criterion restrictEnum(String propertyName, E e) {
             throw new UnsupportedOperationException();
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
@@ -100,7 +100,7 @@ public enum Operator {
         @Override
         public <E extends Enum<E>> Criterion restrictEnum(String propertyName, E e) {
             return restrict(propertyName, e);
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
@@ -125,7 +125,7 @@ public enum Operator {
         @Override
         public <E extends Enum<E>> Criterion restrictEnum(String propertyName, E e) {
             throw new UnsupportedOperationException();
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
@@ -150,7 +150,7 @@ public enum Operator {
         @Override
         public <E extends Enum<E>> Criterion restrictEnum(String propertyName, E e) {
             throw new UnsupportedOperationException();
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
@@ -179,7 +179,7 @@ public enum Operator {
                 Restrictions.ne(propertyName, e),
                 Restrictions.isNull(propertyName)
             );
-        };
+        }
         
         @Override
         public Criterion restrictCollection(String propertyName, int size) {
